@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>CBT Sandi Caesar</title>
+
+<style>
+
+body{
+
+font-family:Arial;
+background:linear-gradient(135deg,#0f2027,#2c5364);
+color:white;
+text-align:center;
+
+}
+
+.box{
+
+background:white;
+color:black;
+width:800px;
+margin:auto;
+padding:20px;
+border-radius:20px;
+
+}
+
+.encrypt{
+
+font-size:40px;
+color:red;
+margin:20px;
+
+}
+
+input,button{
+
+padding:10px;
+font-size:18px;
+margin:10px;
+
+}
+
+.info{
+
+font-size:20px;
+
+}
+
+.medal{
+
+font-size:50px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>CBT GAME SANDI CAESAR</h1>
+
+<div class="box" id="login">
+
+Nama Siswa:
+
+<br>
+
+<input id="nama">
+
+<br>
+
+<button onclick="mulai()">Mulai</button>
+
+</div>
+
+
+<div class="box" id="game" style="display:none;">
+
+<div class="info">
+
+Level: <span id="level">1</span> |
+
+Skor: <span id="score">0</span> |
+
+Nyawa: <span id="life">❤️❤️❤️</span> |
+
+Waktu: <span id="time">60</span>
+
+</div>
+
+<div class="encrypt" id="soal"></div>
+
+<input id="jawab">
+
+<br>
+
+<button onclick="cek()">Jawab</button>
+
+<button onclick="kirim()">Selesai</button>
+
+<div class="medal" id="medal"></div>
+
+</div>
+
+<script>
+
+let nama="";
+let score=0;
+let level=1;
+let life=3;
+let waktu=60;
+
+let asli="";
+let shift=1;
+
+let kata=[
+
+"DATA","SISWA","GURU","UJIAN","SERVER",
+
+"CLIENT","JARINGAN","ENKRIPSI"
+
+];
+
+
+// GOOGLE FORM
+
+let FORM_URL="ISI_SENDIRI";
+
+let ENTRY_NAMA="entry.xxx";
+
+let ENTRY_SKOR="entry.xxx";
+
+let ENTRY_LEVEL="entry.xxx";
+
+
+
+function mulai(){
+
+nama=document.getElementById("nama").value;
+
+if(nama=="") return alert("Isi nama");
+
+document.getElementById("login").style.display="none";
+
+document.getElementById("game").style.display="block";
+
+soalBaru();
+
+timer();
+
+}
+
+
+function encrypt(teks){
+
+let hasil="";
+
+for(let c of teks){
+
+hasil+=String.fromCharCode(c.charCodeAt(0)+shift);
+
+}
+
+return hasil;
+
+}
+
+
+function soalBaru(){
+
+shift=Math.floor(Math.random()*level)+1;
+
+asli=kata[Math.floor(Math.random()*kata.length)];
+
+document.getElementById("soal").innerHTML=encrypt(asli);
+
+}
+
+
+function cek(){
+
+let j=document.getElementById("jawab").value.toUpperCase();
+
+if(j==asli){
+
+score+=10;
+
+if(score%50==0) level++;
+
+}else{
+
+life--;
+
+}
+
+update();
+
+if(life==0){
+
+selesai();
+
+}
+
+soalBaru();
+
+}
+
+
+function update(){
+
+scoreHTML.innerHTML=score;
+
+levelHTML.innerHTML=level;
+
+lifeHTML.innerHTML="❤️".repeat(life);
+
+}
+
+
+function timer(){
+
+setInterval(()=>{
+
+waktu--;
+
+time.innerHTML=waktu;
+
+if(waktu==0) selesai();
+
+},1000);
+
+}
+
+
+function medal(){
+
+if(score>=200) return "🥇";
+
+if(score>=100) return "🥈";
+
+if(score>=50) return "🥉";
+
+return "";
+
+}
+
+
+function selesai(){
+
+document.getElementById("medal").innerHTML=medal();
+
+alert("Ujian selesai");
+
+}
+
+
+function kirim(){
+
+fetch(FORM_URL,{
+
+method:"POST",
+
+mode:"no-cors",
+
+headers:{
+
+"Content-Type":"application/x-www-form-urlencoded"
+
+},
+
+body:
+
+ENTRY_NAMA+"="+nama+
+
+"&"+ENTRY_SKOR+"="+score+
+
+"&"+ENTRY_LEVEL+"="+level
+
+});
+
+alert("Skor terkirim");
+
+}
+
+
+// anti refresh
+
+window.onbeforeunload=function(){
+
+return "Yakin keluar?";
+
+};
+
+</script>
+
+</body>
+</html>
