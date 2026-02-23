@@ -7,51 +7,46 @@
 <style>
 
 body{
-
 font-family:Arial;
 background:linear-gradient(135deg,#0f2027,#2c5364);
 color:white;
 text-align:center;
-
 }
 
 .box{
-
 background:white;
 color:black;
 width:800px;
 margin:auto;
 padding:20px;
 border-radius:20px;
-
 }
 
 .encrypt{
-
 font-size:40px;
 color:red;
 margin:20px;
+}
 
+.kunci{
+font-size:22px;
+color:blue;
+margin:10px;
+font-weight:bold;
 }
 
 input,button{
-
 padding:10px;
 font-size:18px;
 margin:10px;
-
 }
 
 .info{
-
 font-size:20px;
-
 }
 
 .medal{
-
 font-size:50px;
-
 }
 
 </style>
@@ -82,13 +77,14 @@ Nama Siswa:
 <div class="info">
 
 Level: <span id="level">1</span> |
-
 Skor: <span id="score">0</span> |
-
 Nyawa: <span id="life">❤️❤️❤️</span> |
-
 Waktu: <span id="time">60</span>
 
+</div>
+
+<div class="kunci">
+Kunci (Shift): <span id="kunci">-</span>
 </div>
 
 <div class="encrypt" id="soal"></div>
@@ -99,7 +95,7 @@ Waktu: <span id="time">60</span>
 
 <button onclick="cek()">Jawab</button>
 
-<button onclick="kirim()">Selesai</button>
+<button onclick="kirim()">Selesai & Kirim</button>
 
 <div class="medal" id="medal"></div>
 
@@ -116,18 +112,38 @@ let waktu=60;
 let asli="";
 let shift=1;
 
+
+// BANK SOAL 20 KATA
+
 let kata=[
 
-"DATA","SISWA","GURU","UJIAN","SERVER",
-
-"CLIENT","JARINGAN","ENKRIPSI"
+"DATA",
+"SISWA",
+"GURU",
+"UJIAN",
+"SERVER",
+"CLIENT",
+"JARINGAN",
+"ENKRIPSI",
+"DEKRIPSI",
+"KOMPUTER",
+"INTERNET",
+"PASSWORD",
+"SECURITY",
+"DATABASE",
+"PROGRAM",
+"ALGORITMA",
+"INFORMATIKA",
+"TEKNOLOGI",
+"APLIKASI",
+"DIGITAL"
 
 ];
 
 
-// GOOGLE FORM
+// URL GOOGLE FORM (SUDAH DIPERBAIKI)
 
-let FORM_URL="1FAIpQLSePISK36m59nq__0SEbfqw7_3iBxjwReAk3JO6O7PmJpTFLUA";
+let FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSePISK36m59nq__0SEbfqw7_3iBxjwReAk3JO6O7PmJpTFLUA/formResponse";
 
 let ENTRY_NAMA="entry.1085492539";
 
@@ -141,14 +157,16 @@ function mulai(){
 
 nama=document.getElementById("nama").value;
 
-if(nama=="") return alert("Isi nama");
+if(nama==""){
+alert("Isi nama dulu");
+return;
+}
 
 document.getElementById("login").style.display="none";
-
 document.getElementById("game").style.display="block";
 
 soalBaru();
-
+update();
 timer();
 
 }
@@ -177,6 +195,8 @@ asli=kata[Math.floor(Math.random()*kata.length)];
 
 document.getElementById("soal").innerHTML=encrypt(asli);
 
+document.getElementById("kunci").innerHTML=shift;
+
 }
 
 
@@ -187,22 +207,32 @@ let j=document.getElementById("jawab").value.toUpperCase();
 if(j==asli){
 
 score+=10;
+alert("Benar");
 
-if(score%50==0) level++;
+if(score%50==0){
+
+level++;
+alert("Naik Level "+level);
+
+}
 
 }else{
 
 life--;
+alert("Salah");
+
+}
+
+if(life<=0){
+
+selesai();
+return;
 
 }
 
 update();
 
-if(life==0){
-
-selesai();
-
-}
+document.getElementById("jawab").value="";
 
 soalBaru();
 
@@ -211,24 +241,31 @@ soalBaru();
 
 function update(){
 
-scoreHTML.innerHTML=score;
+document.getElementById("score").innerHTML=score;
 
-levelHTML.innerHTML=level;
+document.getElementById("level").innerHTML=level;
 
-lifeHTML.innerHTML="❤️".repeat(life);
+document.getElementById("life").innerHTML="❤️".repeat(life);
+
+document.getElementById("time").innerHTML=waktu;
 
 }
 
 
 function timer(){
 
-setInterval(()=>{
+let t=setInterval(()=>{
 
 waktu--;
 
-time.innerHTML=waktu;
+update();
 
-if(waktu==0) selesai();
+if(waktu<=0){
+
+clearInterval(t);
+selesai();
+
+}
 
 },1000);
 
@@ -237,13 +274,13 @@ if(waktu==0) selesai();
 
 function medal(){
 
-if(score>=200) return "🥇";
+if(score>=200) return "🥇 EMAS";
 
-if(score>=100) return "🥈";
+if(score>=100) return "🥈 PERAK";
 
-if(score>=50) return "🥉";
+if(score>=50) return "🥉 PERUNGGU";
 
-return "";
+return "🎓 PESERTA";
 
 }
 
@@ -252,7 +289,7 @@ function selesai(){
 
 document.getElementById("medal").innerHTML=medal();
 
-alert("Ujian selesai");
+alert("Ujian selesai\nSkor: "+score);
 
 }
 
@@ -266,27 +303,21 @@ method:"POST",
 mode:"no-cors",
 
 headers:{
-
 "Content-Type":"application/x-www-form-urlencoded"
-
 },
 
 body:
 
-ENTRY_NAMA+"="+nama+
-
-"&"+ENTRY_SKOR+"="+score+
-
-"&"+ENTRY_LEVEL+"="+level
+ENTRY_NAMA+"="+encodeURIComponent(nama)+
+"&"+ENTRY_SKOR+"="+encodeURIComponent(score)+
+"&"+ENTRY_LEVEL+"="+encodeURIComponent(level)
 
 });
 
-alert("Skor terkirim");
+alert("Skor berhasil dikirim");
 
 }
 
-
-// anti refresh
 
 window.onbeforeunload=function(){
 
