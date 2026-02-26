@@ -178,7 +178,11 @@ let hasil="";
 
 for(let c of teks){
 
-hasil+=String.fromCharCode(c.charCodeAt(0)+shift);
+let kode = c.charCodeAt(0) - 65; // ubah ke 0–25
+
+kode = (kode + shift) % 26; // geser + modulo
+
+hasil += String.fromCharCode(kode + 65); // kembali ke A–Z
 
 }
 
